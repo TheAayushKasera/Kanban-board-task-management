@@ -47,7 +47,7 @@ const TaskModel = new mongoose.model("tasks", TasksSchema);
 // Define a function to fetch data from the database
 const getData = async () => {
   const result = await TaskModel.find();
-  console.log(result);
+
   return result;
 };
 

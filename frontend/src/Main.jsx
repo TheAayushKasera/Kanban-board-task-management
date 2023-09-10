@@ -4,6 +4,7 @@ import Tododrop from "./Tododrop";
 import { Context } from "./Context";
 import Doingdrop from "./Doingdrop";
 import Donedrop from "./Donedrop";
+import Addtask from "./Addtask";
 
 const Main = () => {
   // State for task lists and input fields
@@ -12,6 +13,7 @@ const Main = () => {
   const [donearr, setDone] = useState([]);
   const [title, updateTitle] = useState("");
   const [desc, updateDesc] = useState("");
+  const [loading, setLoading] = useState(false);
   // Fetch data from the API when the component mounts
   useEffect(() => {
     getdata();
@@ -19,8 +21,11 @@ const Main = () => {
 
   // Function to fetch data from the API
   const getdata = async () => {
+    setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/api/getdata/");
+      const response = await fetch(
+        "https://kanban-board-backend-z6wp.onrender.com/api/getdata/"
+      );
 
       if (response.ok) {
         let todoarr = [];
@@ -47,10 +52,12 @@ const Main = () => {
     } catch (err) {
       console.error(err);
     }
+    setLoading(false);
   };
 
   // Function to update the 'progress' field of a task
   const putprogress = async (_id, progress) => {
+    setLoading(true);
     const requestOptions = {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -58,16 +65,18 @@ const Main = () => {
     };
 
     const response = await fetch(
-      "http://localhost:8000/api/updateprogress/",
+      "https://kanban-board-backend-z6wp.onrender.com/api/updateprogress/",
       requestOptions
     );
 
     const data = await response.text();
     console.log(data);
+    setLoading(false);
   };
 
   // Function to delete a task
   const deleteTask = async (task) => {
+    setLoading(true);
     try {
       const requestOptions = {
         method: "DELETE",
@@ -76,7 +85,7 @@ const Main = () => {
       };
 
       const response = await fetch(
-        `http://localhost:8000/api/deletedata/`,
+        `https://kanban-board-backend-z6wp.onrender.com/api/deletedata/`,
         requestOptions
       );
 
@@ -87,11 +96,13 @@ const Main = () => {
       alert("Got some Error ❌");
     }
     await getdata();
+    setLoading(false);
   };
 
   // Function to edit a task
   const editTask = async (_id) => {
-    if (title == "" || desc == "") {
+    setLoading(true);
+    if (title === "" || desc === "") {
       alert("Please enter title and description");
     } else {
       try {
@@ -102,7 +113,7 @@ const Main = () => {
         };
 
         const response = await fetch(
-          `http://localhost:8000/api/updatetask`,
+          `https://kanban-board-backend-z6wp.onrender.com/api/updatetask`,
           requestOptions
         );
 
@@ -113,6 +124,7 @@ const Main = () => {
         console.log(err);
       }
     }
+    setLoading(false);
   };
 
   // Function called when a drag-and-drop operation ends
@@ -162,35 +174,41 @@ const Main = () => {
       putprogress(removed._id, progress);
     }
   };
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  } else {
+    return (
+      <>
+        <Addtask />
+        <Context.Provider
+          value={{
+            title,
+            updateTitle,
+            desc,
+            updateDesc,
+            todoarr,
+            doingarr,
+            donearr,
+            putprogress,
+            deleteTask,
+            editTask,
+          }}
+        >
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div className="main-container">
+              <Tododrop />
 
-  return (
-    <Context.Provider
-      value={{
-        title,
-        updateTitle,
-        desc,
-        updateDesc,
-        todoarr,
-        doingarr,
-        donearr,
-        putprogress,
-        deleteTask,
-        editTask,
-      }}
-    >
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="main-container">
-          <Tododrop />
+              {/* Doing column */}
 
-          {/* Doing column */}
-
-          <Doingdrop />
-          {/* Done column */}
-          <Donedrop />
-        </div>
-      </DragDropContext>
-    </Context.Provider>
-  );
+              <Doingdrop />
+              {/* Done column */}
+              <Donedrop />
+            </div>
+          </DragDropContext>
+        </Context.Provider>
+      </>
+    );
+  }
 };
 
 export default Main;
