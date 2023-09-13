@@ -15,7 +15,7 @@ var i = 0;
 setInterval(() => {
   i += 3;
   console.log(`server started ${i} min ago`);
-}, 180000000);
+}, 180000);
 // Load environment variables from a .env file
 require("dotenv").config();
 
