@@ -11,11 +11,6 @@ app.use(bodyparser.json());
 app.use(cors());
 
 const port = process.env.PORT || 8000;
-var i = 0;
-setInterval(() => {
-  i += 3;
-  console.log(`server started ${i} min ago`);
-}, 180000);
 // Load environment variables from a .env file
 require("dotenv").config();
 
@@ -117,7 +112,10 @@ app.get("/api/getdata", async (req, res) => {
   const result = await getData();
   res.send(result);
 });
-
+app.get("/api/corn-job", (req, res) => {
+  console.log("Corn-job api called");
+  res.send("backend works");
+});
 app.post("/api/postdata", async (req, res) => {
   const title = req.body.title;
   const desc = req.body.desc;
