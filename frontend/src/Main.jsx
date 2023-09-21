@@ -16,12 +16,13 @@ const Main = () => {
   const [loading, setLoading] = useState(false);
   // Fetch data from the API when the component mounts
   useEffect(() => {
+    setLoading(true);
     getdata();
+    setLoading(false);
   }, []);
 
   // Function to fetch data from the API
   const getdata = async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         "https://kanban-board-backend-z6wp.onrender.com/api/getdata/"
@@ -52,12 +53,10 @@ const Main = () => {
     } catch (err) {
       console.error(err);
     }
-    setLoading(false);
   };
 
   // Function to update the 'progress' field of a task
   const putprogress = async (_id, progress) => {
-    setLoading(true);
     const requestOptions = {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -71,12 +70,10 @@ const Main = () => {
 
     const data = await response.text();
     console.log(data);
-    setLoading(false);
   };
 
   // Function to delete a task
   const deleteTask = async (task) => {
-    setLoading(true);
     try {
       const requestOptions = {
         method: "DELETE",
@@ -96,12 +93,10 @@ const Main = () => {
       alert("Got some Error ❌");
     }
     await getdata();
-    setLoading(false);
   };
 
   // Function to edit a task
   const editTask = async (_id) => {
-    setLoading(true);
     if (title === "" || desc === "") {
       alert("Please enter title and description");
     } else {
@@ -124,7 +119,6 @@ const Main = () => {
         console.log(err);
       }
     }
-    setLoading(false);
   };
 
   // Function called when a drag-and-drop operation ends
